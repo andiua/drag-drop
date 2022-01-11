@@ -1,0 +1,22 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+/.nyc_output
+/cypress/videos/
+
+# production
+/build
+/dists
+
+
+npm-debug.log*
+
+logs
+.npmrc
+typings
+.vscode
