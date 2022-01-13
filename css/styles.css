@@ -16,7 +16,7 @@ svg {
   text-align: center; }
 
 .wrap {
-  min-height: 100vh;
+  min-height: 300vh;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -47,7 +47,6 @@ svg {
   -webkit-box-shadow: 0 0 50px rgba(35, 4, 51, 0.36), 0 2px 6px rgba(0, 0, 0, 0.6), 0 10px 40px rgba(35, 4, 51, 0.5);
           box-shadow: 0 0 50px rgba(35, 4, 51, 0.36), 0 2px 6px rgba(0, 0, 0, 0.6), 0 10px 40px rgba(35, 4, 51, 0.5);
   border-radius: 26px;
-  overflow: hidden;
   background-color: #1c012a; }
 
 .game_title {
@@ -69,7 +68,13 @@ svg {
           justify-content: space-between;
   -webkit-box-align: center;
       -ms-flex-align: center;
-          align-items: center; }
+          align-items: center;
+  -ms-touch-action: none;
+      touch-action: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
 
 .game_board {
   margin: 2px -3px; }
@@ -107,8 +112,7 @@ svg {
 
 @media (max-width: 767px) {
   .game_block {
-    padding: 50px 15px 25px 15px;
-    background: url("../img/game/game_bg_m.jpg") top left/cover no-repeat; }
+    padding: 50px 15px 25px 15px; }
   .section__title {
     margin-bottom: 40px; }
   .game_line {

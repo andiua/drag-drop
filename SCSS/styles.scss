@@ -17,7 +17,7 @@ svg{
 	text-align: center;
 }
 .wrap{
-	min-height: 100vh;
+	min-height: 300vh;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;	
@@ -41,7 +41,6 @@ svg{
 	box-shadow: 0 0 50px rgba(35, 4, 51, 0.36), 0 2px 6px rgba(0, 0, 0, 0.6),
 		0 10px 40px rgba(35, 4, 51, 0.5);
 	border-radius: 26px;
-	overflow: hidden;
 	background-color: #1c012a;
 }
 
@@ -61,8 +60,9 @@ svg{
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	touch-action: none;
+	user-select: none;
 }
-
 .game_board {
 	margin: 2px -3px;
 }
@@ -104,7 +104,6 @@ svg{
 @media (max-width: 767px) {
 	.game_block {
 		padding: 50px 15px 25px 15px;
-		background: url('../img/game/game_bg_m.jpg') top left/ cover no-repeat;
 	}
 
 	.section__title {
