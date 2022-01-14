@@ -44,25 +44,37 @@ class DragDrop{
 				left: bounding.left,
 				bottom: bounding.bottom,
 				right: bounding.right,
+				width: bounding.width,
+				height: bounding.height
 			}
 			this.dropCoordinates.push(coordinates);
 		});
 		// console.log(this.dropCoordinates);
 	}
-	checkCoincidence(drag) {
+	checkCoincidence(drag, e) {
 		const bounding = drag.getBoundingClientRect();
+		console.log(bounding);
 		console.log(this.dropCoordinates[0]);
-		console.log(this.dropTarget);
 		const boolean = this.dropCoordinates.some(item => {
-			if(item.top < bounding.top && item.left < bounding.left) {
-				console.log('object');
+			// під розмір об'єкта
+			if(item.top <= bounding.top + bounding.height/2 && item.left <= bounding.left + bounding.width/2
+				&& item.bottom >= bounding.bottom - bounding.height/2 && item.right >= bounding.right - bounding.width/2 ) {
+					// під позицію миші
+			// if(item.top <= e.clientY && item.left <= e.clientX
+			// 	&& item.bottom >= e.clientY && item.right >= e.clientX ) {
 				const transformValues = drag.style.transform.match(/(-\d+|\d+)/g);
-				let translateX = item.left - bounding.left + (+transformValues[0]);
-				let translateY = item.top - bounding.top + (+transformValues[1]);
-				drag.style.cssText = `
-				transition: ${this.options.transition};
-				transform: translate(${translateX}px, ${translateY}px)`;
-				setTimeout(() => {drag.style.transition = ''}, 400);
+				let translateX, translateY;
+				if(this.options.dropIntoCenter) {
+					let centerX = (bounding.width - item.width) /2;
+					let centerY = (bounding.height - item.height) /2;
+					translateX = item.left - centerX - bounding.left + (+transformValues[0]);
+					translateY = item.top - centerY - bounding.top + (+transformValues[1]);
+					drag.style.cssText = `
+					transition: ${this.options.transition};
+					transform: translate(${translateX}px, ${translateY}px)`;
+					setTimeout(() => {drag.style.transition = ''}, 400);
+				} 
+				drag.style.pointerEvents = 'none';
 				return true;
 			}
 			return false;
@@ -110,8 +122,8 @@ class DragDrop{
 			}
 		})
 	}
-	addFinishCoordinates(drag) {
-		if(!this.checkCoincidence(drag) && !this.options.dropEveryWhere) {
+	addFinishCoordinates(drag, e) {
+		if(!this.checkCoincidence(drag, e) && !this.options.dropEveryWhere) {
 			drag.style.transition = this.options.transition;
 			drag.style.transform = '';
 			setTimeout(() => {drag.style.transition = ''}, 400);
@@ -144,7 +156,7 @@ class DragDrop{
 		document.body.removeEventListener('pointermove', this.boundDragMove);
 		document.body.removeEventListener('pointerup', this.boundDragUp);
 		drag.style.cursor = '';
-		this.addFinishCoordinates(drag);
+		this.addFinishCoordinates(drag, e);
 
 	}
 	addEvents() {
@@ -163,8 +175,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	new DragDrop({
 		dragTarget: '[data-drag="2"]',
 		dropTarget: '[data-drop="2"]',
-		dropIntoCenter: true,
-		dropEveryWhere: true
+		dropEveryWhere: true,
 	}).init();
 	new DragDrop({
 		dragTarget: '[data-drag="1"]',

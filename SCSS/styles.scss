@@ -1,5 +1,4 @@
-
-body{
+body {
 	font-family: 'Alice', serif;
 	margin: 0;
 	background: #3b035c;
@@ -8,29 +7,29 @@ body{
 canvas,
 img,
 video,
-svg{
-  max-width: 100%;
-  height: auto;
-  vertical-align: middle;
+svg {
+	max-width: 100%;
+	height: auto;
+	vertical-align: middle;
 }
-.center{
+.center {
 	text-align: center;
 }
-.wrap{
+.wrap {
 	min-height: 300vh;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;	
+	justify-content: center;
 }
-p{
+p {
 	margin: 0;
 	color: #fff;
 }
-.page__title{
+.page__title {
 	color: #e89e25;
 	margin: 50px 0 0;
 }
-.section__title{
+.section__title {
 	color: #e89e25;
 	margin-bottom: 75px;
 }
@@ -84,9 +83,9 @@ p{
 	margin: 3px;
 	display: block;
 }
-.footer{
-	padding-bottom:20px;
-	margin-top:auto; 
+.footer {
+	padding-bottom: 20px;
+	margin-top: auto;
 }
 @media (max-width: 992px) {
 	.section_game {
