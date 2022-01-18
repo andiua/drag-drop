@@ -7,7 +7,9 @@ class DragDrop {
 		dropEveryWhere = false,
 		dropFewInOne = false,
 		dropIntoCenter = false,
+		enableDropped = false,
 		transition = 'transform 0.4s ease-in-out',
+		afterDroped
 	}) {
 		if (!dragElement) {
 			console.warn('drag&drop: Need 1 propertie "dragElement"');
@@ -21,7 +23,9 @@ class DragDrop {
 			dropFewInOne,
 			dropIntoCenter,
 			transition,
+			enableDropped,
 		};
+		this.afterDroped = afterDroped;
 		this.transitionTime = () => {
 			const getTime = transition.match(/(\d+.\d+s |.\d+s | \d+s | \d+ms)/g)[0];
 			if(getTime.includes('ms')) {
@@ -50,7 +54,6 @@ class DragDrop {
 	init() {
 		this.dragElement.forEach((drag, i) => {
 			this.boundDragDown[i] = this.dragDown.bind(this, drag);
-			// this.boundDragDown = this.dragDown.bind(this, drag);
 			drag.addEventListener('pointerdown', this.boundDragDown[i]);
 		});
 	}
@@ -69,7 +72,6 @@ class DragDrop {
 			};
 			this.dropCoordinates.push(coordinates);
 		});
-		// console.log(this.dropCoordinates);
 	}
 	dropItem(drag, drop, e) {
 		const bounding = drag.getBoundingClientRect();
@@ -78,8 +80,8 @@ class DragDrop {
 		if (this.options.dropIntoCenter) {
 			let centerX = (bounding.width - drop.width) / 2;
 			let centerY = (bounding.height - drop.height) / 2;
-			translateX = drop.left - centerX - bounding.left + +transformValues[0];
-			translateY = drop.top - centerY - bounding.top + +transformValues[1];
+			translateX = drop.left - centerX - bounding.left + Number(transformValues[0]);
+			translateY = drop.top - centerY - bounding.top + Number(transformValues[1]);
 			drag.style.cssText = `
 					transition: ${this.options.transition};
 					transform: translate(${translateX}px, ${translateY}px)`;
@@ -87,16 +89,23 @@ class DragDrop {
 				drag.style.transition = '';
 			}, this.transitionTime());
 		}
-		this.dragElement.forEach((item, i) => {
-			if (item === drag) {
-				drag.removeEventListener('pointerdown', this.boundDragDown[i]);
-			}
-		});
-		drag.style.cursor = 'auto';
+		if(!this.options.enableDropped) {
+			this.dragElement.forEach((item, i) => {
+				if (item === drag) {
+					drag.removeEventListener('pointerdown', this.boundDragDown[i]);
+					drag.style.cursor = 'auto';
+				}
+			});
+		}
+		if(this.afterDroped) {
+			this.afterDroped();
+		}
+		drag.classList.add('dropped');
+		drag.classList.remove('droppable');
 	}
 	checkCoincidence(drag, e) {
 		const bounding = drag.getBoundingClientRect();
-		const boolean = this.dropCoordinates.some(item => {
+		const boolean = this.dropCoordinates.some((item, i) => {
 			// під позицію миші
 			// if(item.top <= e.clientY && item.left <= e.clientX
 			// 	&& item.bottom >= e.clientY && item.right >= e.clientX ) {
@@ -105,9 +114,15 @@ class DragDrop {
 				item.left <= bounding.left + bounding.width / 2 &&
 				item.bottom >= bounding.bottom - bounding.height / 2 &&
 				item.right >= bounding.right - bounding.width / 2) {
-				this.dropItem(drag, item, e);
-				return true;
+					drag.classList.add('droppable');
+					this.dropElement[i].classList.add('droppable__hover');
+					if(e.type !== 'pointermove') {
+						this.dropItem(drag, item, e);
+					}
+					return true;
 			}
+			drag.classList.remove('droppable');
+			this.dropElement[i].classList.remove('droppable__hover');
 			return false;
 		});
 		return boolean;
@@ -121,23 +136,22 @@ class DragDrop {
 			right: bounding.right,
 		};
 		this.dragElement.forEach((item, i) => {
-			if (!this.eventStartCoordinates[i] && item === drag) {
-				// через !this.eventStartCoordinates є бага "смикання"
+			if ((!this.eventStartCoordinates[i] && item === drag)
+			|| (!this.options.dropEveryWhere && item === drag && !drag.classList.contains('dropped')) ){
+				console.log('object');
 				this.eventStartCoordinates[i] = {
 					left: e.clientX,
 					top: e.clientY,
 				};
-				console.log(this.eventStartCoordinates[i]);
-			} else if(this.eventStartCoordinates[i] && drag.style.transform) {
-					// const transformValues = drag.style.transform.match(/(-\d+|\d+)/g);
-					// console.log(this.eventStartCoordinates[i]);
-					// this.eventStartCoordinates[i] = {
-					// 	left: this.eventStartCoordinates[i].left + Number(transformValues[0]),
-					// 	top: this.eventStartCoordinates[i].top + Number(transformValues[1])
-					// };
-					// console.log(drag.style.transform);
-					// console.log(this.eventStartCoordinates[i]);
-				}
+			} else if((this.eventStartCoordinates[i] && drag.style.transform)
+			|| this.options.enableDropped && item === drag && drag.classList.contains('dropped')) {
+				const transformValues = drag.style.transform.match(/(-\d+|\d+)/g);
+				this.eventStartCoordinates[i] = {
+					left: e.clientX - Number(transformValues[0]),
+					top: e.clientY - Number(transformValues[1])
+				};
+			}
+			drag.classList.remove('dropped');
 		});
 	}
 	changeDragCoordinates(e, drag) {
@@ -149,14 +163,7 @@ class DragDrop {
 			if (item === drag) {
 				let translateX = this.eventCoordinates.left - this.eventStartCoordinates[i].left;
 				let translateY = this.eventCoordinates.top - this.eventStartCoordinates[i].top;
-				// пробував пофіксити багу з !this.eventStartCoordinates
-				// if(drag.style.transform && !drag.classList.contains('dragging')) {
-				// 	const transformValues = drag.style.transform.match(/(-\d+|\d+)/g);
-				// 	translateX += +transformValues[0];
-				// 	translateY = +transformValues[1];
-				// 	console.log(drag.style.transform)
-				// }
-				console.log(`${translateX}px, ${translateY}px`);
+				// console.log(`${translateX}px, ${translateY}px`);
 				drag.style.cssText = `
 					transform: translate(${translateX}px, ${translateY}px);
 					position: relative;
@@ -173,7 +180,6 @@ class DragDrop {
 				drag.style.transition = '';
 			}, this.transitionTime());
 		}
-
 		drag.style.position = '';
 		drag.style.zIndex = '';
 	}
@@ -189,11 +195,13 @@ class DragDrop {
 		this.addBasicCoordinates(e, drag);
 		this.changeDragCoordinates(e, drag);
 		drag.classList.add('dragging');
+		
 	}
 	dragMove(drag, e) {
 		e.preventDefault();
 		drag.style.cursor = 'grabbing';
 		this.changeDragCoordinates(e, drag);
+		this.checkCoincidence(drag, e);
 	}
 	dragUp(drag, e) {
 		drag.classList.remove('dragging');
@@ -215,10 +223,12 @@ window.addEventListener('DOMContentLoaded', () => {
 		dragElement: '[data-drag="2"]',
 		dropElement: '[data-drop="2"]',
 		dropEveryWhere: true,
+
 	}).init();
 	new DragDrop({
 		dragElement: '[data-drag="1"]',
 		dropElement: '[data-drop="1"]',
 		dropIntoCenter: true,
+		enableDropped: true,
 	}).init();
 });
