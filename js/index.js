@@ -75,7 +75,7 @@ class DragDrop {
 	}
 	dropItem(drag, drop, e) {
 		const bounding = drag.getBoundingClientRect();
-		const transformValues = drag.style.transform.match(/(-\d+|\d+)/g);
+		const transformValues = drag.style.transform.match(/(-\d+\.\d+|\d+\.\d+|-\d+|\d+)/g);
 		let translateX, translateY;
 		if (this.options.dropIntoCenter) {
 			let centerX = (bounding.width - drop.width) / 2;
@@ -136,16 +136,18 @@ class DragDrop {
 			right: bounding.right,
 		};
 		this.dragElement.forEach((item, i) => {
-			if ((!this.eventStartCoordinates[i] && item === drag)
-			|| (!this.options.dropEveryWhere && item === drag && !drag.classList.contains('dropped')) ){
-				console.log('object');
+			const itemDrag = item === drag;
+			if ((!this.eventStartCoordinates[i] && itemDrag)
+			|| (!this.options.dropEveryWhere && itemDrag && !drag.classList.contains('dropped')) ){
+				console.log('object1');
 				this.eventStartCoordinates[i] = {
 					left: e.clientX,
 					top: e.clientY,
 				};
 			} else if((this.eventStartCoordinates[i] && drag.style.transform)
-			|| this.options.enableDropped && item === drag && drag.classList.contains('dropped')) {
-				const transformValues = drag.style.transform.match(/(-\d+|\d+)/g);
+			|| this.options.enableDropped && itemDrag && drag.classList.contains('dropped')) {
+				const transformValues = drag.style.transform.match(/(-\d+\.\d+|\d+\.\d+|-\d+|\d+)/g);
+				console.log('object2');
 				this.eventStartCoordinates[i] = {
 					left: e.clientX - Number(transformValues[0]),
 					top: e.clientY - Number(transformValues[1])
@@ -185,6 +187,7 @@ class DragDrop {
 	}
 	// events
 	dragDown(drag, e) {
+		console.log('dragDown');
 		this.boundDragMove = this.dragMove.bind(this, drag);
 		this.boundDragUp = this.dragUp.bind(this, drag);
 		document.body.addEventListener('pointermove', this.boundDragMove);
@@ -198,12 +201,14 @@ class DragDrop {
 		
 	}
 	dragMove(drag, e) {
+		console.log('dragMove');
 		e.preventDefault();
 		drag.style.cursor = 'grabbing';
 		this.changeDragCoordinates(e, drag);
 		this.checkCoincidence(drag, e);
 	}
 	dragUp(drag, e) {
+		console.log('dragUp');
 		drag.classList.remove('dragging');
 		document.body.removeEventListener('pointermove', this.boundDragMove);
 		document.body.removeEventListener('pointerup', this.boundDragUp);
@@ -231,4 +236,10 @@ window.addEventListener('DOMContentLoaded', () => {
 		dropIntoCenter: true,
 		enableDropped: true,
 	}).init();
+	document.addEventListener('dragend', (e) => {
+		e.preventDefault()
+	})
+	// щоб уникнути проблем з драгстартом, можна переписати плагін
+	// під document drag, треба тільки додати індекси для drag елементів
+	// в ШТМЛ і маніпулювати eventStartCoordinates[i] з його допомогою
 });

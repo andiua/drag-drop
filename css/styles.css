@@ -10,7 +10,8 @@ video,
 svg {
   max-width: 100%;
   height: auto;
-  vertical-align: middle; }
+  vertical-align: middle;
+  -webkit-user-drag: none; }
 
 .center {
   text-align: center; }
@@ -79,6 +80,8 @@ p {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none; }
+  .game_line2 .game_box {
+    width: 60px; }
 
 .game_board {
   margin: 2px -3px; }
@@ -89,10 +92,7 @@ p {
       touch-action: none; }
 
 .game_box {
-  min-width: 75px;
-  min-height: 75px;
-  max-width: 75px;
-  max-height: 75px;
+  width: 75px;
   margin: 3px;
   display: block; }
 
@@ -104,34 +104,15 @@ p {
   .section_game {
     padding: 80px 0; }
   .game_box {
-    min-width: 70px;
-    min-height: 70px;
-    max-width: 70px;
-    max-height: 70px; }
-  .elemImg {
-    min-width: 70px;
-    min-height: 70px;
-    max-width: 70px;
-    max-height: 70px; } }
+    width: 70px; } }
 
 @media (max-width: 767px) {
   .game_block {
     padding: 50px 15px 25px 15px; }
   .section__title {
     margin-bottom: 40px; }
-  .game_line {
-    margin: -2px;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center; }
   .game_box {
-    min-width: 30px;
-    min-height: 30px;
-    max-width: 30px;
-    max-height: 30px;
-    margin: 2px; }
-  .elemImg {
-    min-width: 30px;
-    min-height: 30px;
-    max-width: 30px;
-    max-height: 30px; } }
+    width: 40px;
+    margin: 3px; }
+  .game_line2 .game_box {
+    width: 30px; } }
